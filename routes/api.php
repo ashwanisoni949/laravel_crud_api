@@ -22,6 +22,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('user_list',[APIController::class,'index'])->name('user_list');
 Route::post('user_insert',[APIController::class,'store'])->name('user_insert');
+Route::post('date_filter',[APIController::class,'date_filter'])->name('date_filter');
+
+
 Route::get('show_user/{id}',[APIController::class,'show'])->name('show_user');
 Route::delete('user_delete_api/{id}',[APIController::class,'destroy'])->name('user_delete_api');
 Route::patch('user_update_api/{id}',[APIController::class,'update'])->name('user_update_api');

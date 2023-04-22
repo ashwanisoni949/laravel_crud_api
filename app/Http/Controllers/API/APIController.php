@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\UserDetail;
 use App\Models\UserList;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class APIController extends Controller
 {
@@ -40,17 +41,21 @@ class APIController extends Controller
      */
     public function store(Request $request)
     {
-        
 
-        // dd($request->all());
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name'    => 'required | alpha',
             'email'   => 'required|email|unique:user_list',
             'number'  => 'required | min:10',
             'date'    => 'required',
             'address' => 'required',
             'gender'  => 'required'
-        ]);
+           ]);
+       if ($validator->fails()) {
+               return response()->json([
+                 'message' => 'Filled is Required', // the ,message you want to show
+                   'errors' => $validator->errors()
+               ], 422);
+           }
 
         $user_list = new UserList();
         $user_list->name    = $request->name;
@@ -105,15 +110,20 @@ class APIController extends Controller
     public function update(Request $request, $id)
     {
         
-        // dd($request->all());
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name'    => 'required | alpha',
             'email'   => 'required|email',
-            'number'  => 'required',
+            'number'  => 'required | min:10',
             'date'    => 'required',
             'address' => 'required',
             'gender'  => 'required'
-        ]);
+           ]);
+       if ($validator->fails()) {
+               return response()->json([
+                 'message' => 'Filled is Required', // the ,message you want to show
+                   'errors' => $validator->errors()
+               ], 422);
+           }
 
     
         $user_list = UserList::find($id);
@@ -149,23 +159,25 @@ class APIController extends Controller
     }
     public function date_filter(Request $request)
     {
-        // dd($request->all());
+        
+        $validator = Validator::make($request->all(), [
+            'start_date' => 'required',
+            'end_date'   => 'required',
+           ]);
+       if ($validator->fails()) {
+               return response()->json([
+                 'message' => 'Filled is Required', // the ,message you want to show
+                   'errors' => $validator->errors()
+               ], 422);
+           }
        
-
-        // $request->validate([
-        //     'start_date' => 'required',
-        //     'end_date'   => 'required',
-        // ]);
         $start_date = Carbon::parse($request->start_date);
         $end_date = Carbon::parse($request->end_date);
-        // dd($end_date->format('Y-m-d'));
 
         $filter_user_date = UserList::whereDate('date','<=',$end_date->format('Y-m-d'))
         ->whereDate('date','>=',$start_date->format('Y-m-d'))->get();
 
         return response($filter_user_date);
-        // $date_filter = UserList
-
 
     }
 }
